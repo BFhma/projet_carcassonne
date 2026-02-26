@@ -6,22 +6,16 @@ BIN = ./bin/
 CC = gcc
 CFLAGS = -Wall -std=c11
 EXEC = carcassonne
-
-.PHONY: all run clean
+OBJ = $(SRC:.c=.o)
 
 all: $(EXEC)
 
-run: $(EXEC)
-	$(BIN)$<
+$(EXEC): $(OBJ)
+	$(CC) $(OBJ) -o $(EXEC)
+	@rm -f $(OBJ)  
 
-$(EXEC): moteur_jeu.o lecteur_csv.o
-	$(CC) $(OBJ)* -I $(INC) -o $(BIN)$@
-	
-moteur_jeu.o: $(SRC)moteur_jeu.c
-	$(CC) $(CFLAGS) $< -c -I $(INC) -o $(OBJ)$@
-
-lecteur_csv.o: $(SRC)lecteur_csv.c
-	$(CC) $(CFLAGS) $< -c -I $(INC) -o $(OBJ)$@
+%.o: %.c structs.h tileFetcher.h deckFunctions.h positionFunctions.h tileFunctions.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm $(BIN)* $(OBJ)*
+	rm -f $(OBJ) $(EXEC)
