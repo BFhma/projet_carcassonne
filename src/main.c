@@ -6,17 +6,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <string.h>
 
 int main(int argc, char* argv[]) {
     argc--;
     argv++;
 
     srand(time(NULL));
-    int nbLines = countLines(*argv);
+
+    char path[256];
+    char *filename = *argv;
+
+    strcpy(path, "data/");
+    strcat(path, filename);
+
+    printf("%s\n", path);
+
+    int nbLines = countLines(path);
 
     // CHARGEMENT DE LA CONFIGURATION VIA LE FICHIER CSV ET CREATION DU 'DECK' DE TUILES
     tile* tileArray = (tile*)malloc(sizeof(tile) * nbLines);
-    parseFile(*argv, tileArray);
+    parseFile(path, tileArray);
     shuffleDeck(tileArray, nbLines);
     int deckHeight = nbLines;
 

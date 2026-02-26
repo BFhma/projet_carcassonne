@@ -1,21 +1,28 @@
-SRC = ./src/
-INC = ./include/
-OBJ = ./obj/
-BIN = ./bin/
+SRC   = ./src
+INC   = ./include
+OBJ   = ./obj
+BIN   = ./bin
 
-CC = gcc
-CFLAGS = -Wall -std=c11
-EXEC = carcassonne
-OBJ = $(SRC:.c=.o)
+CC     = gcc
+CFLAGS = -Wall -std=c11 -I$(INC)
 
-all: $(EXEC)
+EXEC   = carcassonne
 
-$(EXEC): $(OBJ)
-	$(CC) $(OBJ) -o $(EXEC)
-	@rm -f $(OBJ)  
+SRCS = $(wildcard $(SRC)/*.c)
 
-%.o: %.c structs.h tileFetcher.h deckFunctions.h positionFunctions.h tileFunctions.h
+OBJS = $(SRCS:$(SRC)/%.c=$(OBJ)/%.o)
+
+all: $(BIN)/$(EXEC)
+
+$(BIN)/$(EXEC): $(OBJS)
+	@mkdir -p $(BIN)
+	$(CC) $(OBJS) -o $@
+
+$(OBJ)/%.o: $(SRC)/%.c
+	@mkdir -p $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ) $(EXEC)
+	rm -f $(OBJS) $(BIN)/$(EXEC)
+
+.PHONY: all clean
