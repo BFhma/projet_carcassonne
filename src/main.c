@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
     char path[256];
     char *filename = *argv;
 
-    strcpy(path, "data/");
+    strcpy(path, "../data/");
     strcat(path, filename);
 
     printf("%s\n", path);
