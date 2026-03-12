@@ -55,3 +55,51 @@ void rotateRight(tile* t) {
 
     *t = new;
 }
+
+void printTileContent(tile t) {
+    printf("Nord : %s.\n", returnSectionContent(t.north.type));
+    printf("Est : %s.\n", returnSectionContent(t.east.type));
+    printf("Sud : %s.\n", returnSectionContent(t.south.type));
+    printf("Ouest : %s.\n", returnSectionContent(t.west.type));
+    printf("Centre : %s.\n", returnSectionContent(t.center.type));
+}
+
+char* returnSectionContent(sectionType st) {
+    switch(st) {
+        case abbey: {
+            return("Abbaye");
+        }
+        case aegis: {
+            return("Egide");
+        }
+        case village: {
+            return("Village");
+        }
+        case town: {
+            return("Ville");
+        }
+        case road: {
+            return("Route");
+        }
+        case meadow: {
+            return("Pre");
+        }
+    }
+}
+
+bool isMeeplePlaceable(tile t, section s) {
+    switch (s.type) {
+        case abbey: {
+            return true;
+        }
+        case town: {
+            return true;
+        }
+        case road: {
+            // TODO
+        }
+        default: {
+            return false;
+        }
+    }
+}

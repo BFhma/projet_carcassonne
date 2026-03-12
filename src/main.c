@@ -89,14 +89,15 @@ int main(int argc, char* argv[]) {
             gameGrid[nbLines][nbLines] = currentTile;
             addTilePosition(tilePositions, nbLines, nbLines, tilesSet);
             tilesSet++;
-            /*
+            printTileContent(currentTile);
             printf("Joueur %d, veux-tu placer un meeple sur ta tuile ? o/n\n", playerTurn + 1);
             char choice;
             scanf(" %c", &choice);
             if (choice == 'o') {
-                // TODO
+                printf("Sur quelle section ? nord/sud/est/ouest/centre\n");
+                char sectionChoice[6];
+                scanf("%s", sectionChoice);
             }
-            */
             isFirstTurn = false;
         }
         else {
