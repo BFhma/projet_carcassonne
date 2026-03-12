@@ -20,8 +20,6 @@ int main(int argc, char* argv[]) {
     strcpy(path, "../data/");
     strcat(path, filename);
 
-    printf("%s\n", path);
-
     int nbLines = countLines(path);
 
     // CHARGEMENT DE LA CONFIGURATION VIA LE FICHIER CSV ET CREATION DU 'DECK' DE TUILES

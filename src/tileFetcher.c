@@ -62,6 +62,10 @@ void parseFile(char* filename, tile* array)
                 sectionArray[i].type = abbey;
                 sectionArray[i].meepleId = -1;
             }
+            else if (strcmp("village", token) == 0) {
+                sectionArray[i].type = village;
+                sectionArray[i].meepleId = -1;
+            }
 
             i++;
             token = strtok(NULL, ","); // APRES LE PREMIER APPEL DE STRTOK, LE PREMIER ARGUMENT DOIT ETRE NULL,
@@ -81,7 +85,7 @@ void parseFile(char* filename, tile* array)
 }
 
 void printTiles(tile* array, int size) {
-    char* nameArray[5] = {"Road", "Town", "Meadow", "Aegis", "Abbey"};
+    char* nameArray[6] = {"Road", "Town", "Meadow", "Aegis", "Abbey", "Village"};
     for (int i = 0 ; i < size ; i++) {
         printf("Tile n°%d : N = %s, E = %s, S = %s, O = %s, C = %s.\n", i, nameArray[array[i].north.type], nameArray[array[i].east.type], nameArray[array[i].south.type], nameArray[array[i].west.type], nameArray[array[i].center.type]);
     }

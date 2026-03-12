@@ -10,7 +10,7 @@ typedef struct {
 } point;
 
 typedef enum {
-    road, town, meadow, aegis, abbey, empty
+    road, town, meadow, aegis, abbey, village, empty
 } sectionType;
 
 typedef struct {
