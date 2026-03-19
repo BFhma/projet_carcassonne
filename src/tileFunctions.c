@@ -84,6 +84,12 @@ char* returnSectionContent(sectionType st) {
         case meadow: {
             return("Pre");
         }
+        case empty: {
+            return ("Vide");
+        }
+        default: {
+            return ("Vide");
+        }
     }
 }
 
@@ -101,5 +107,50 @@ bool isMeeplePlaceable(tile t, section s) {
         default: {
             return false;
         }
+    }
+}
+
+point* returnPossibilities(tile t, tile** grid, point* positionArray, int size) {
+    int nbCells = (sizeof grid) / (sizeof grid[0][0]);
+    point *res = malloc(nbCells * sizeof *res);
+    int possibilities = 0;
+    for (int i = 0 ; i < size ; i++) {
+        if (grid[positionArray[i].x - 1][positionArray[i].y].center.type == empty) {
+            if (grid[positionArray[i].x][positionArray[i].y].north.type == t.south.type) {
+                res[possibilities].x = positionArray[i].x - 1;
+                res[possibilities].y = positionArray[i].y;
+                possibilities++;
+            }
+        }
+        if (grid[positionArray[i].x + 1][positionArray[i].y].center.type == empty) {
+            if (grid[positionArray[i].x][positionArray[i].y].south.type == t.north.type) {
+                res[possibilities].x = positionArray[i].x + 1;
+                res[possibilities].y = positionArray[i].y;
+                possibilities++;
+            }
+        }
+        if (grid[positionArray[i].x][positionArray[i].y - 1].center.type == empty) {
+            if (grid[positionArray[i].x][positionArray[i].y].west.type == t.east.type) {
+                res[possibilities].x = positionArray[i].x;
+                res[possibilities].y = positionArray[i].y - 1;
+                possibilities++;
+            }
+        }
+        if (grid[positionArray[i].x][positionArray[i].y + 1].center.type == empty) {
+            if (grid[positionArray[i].x][positionArray[i].y].east.type == t.west.type) {
+                res[possibilities].x = positionArray[i].x;
+                res[possibilities].y = positionArray[i].y + 1;
+                possibilities++;
+            }
+        }
+    }
+    res = realloc(res, sizeof(point) * possibilities);
+    return res;
+}
+
+void printPossibilities(point* possibilities, int size) {
+    int length = sizeof(possibilities) / sizeof(possibilities[0]);
+    for (int i = 0 ; i < length ; i++) {
+        printf("Tuile placable en : %d;%d.\n", possibilities[i].x, possibilities[i].y);
     }
 }

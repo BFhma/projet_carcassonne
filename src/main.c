@@ -96,17 +96,59 @@ int main(int argc, char* argv[]) {
             if (choice == 'o') {
                 printf("Sur quelle section ? nord/sud/est/ouest/centre\n");
                 char sectionChoice[6];
-                scanf("%s", sectionChoice);
+                do {
+                    scanf("%s", sectionChoice);
+                    if (strcmp(sectionChoice, "nord") == 0) {
+                        currentTile.north.meepleId = playerTurn;
+                        playerArray[playerTurn].meeples--;
+                    }
+                    else if (strcmp(sectionChoice, "sud") == 0) {
+                        currentTile.south.meepleId = playerTurn;
+                        playerArray[playerTurn].meeples--;
+                    }
+                    else if (strcmp(sectionChoice, "est") == 0) {
+                        currentTile.east.meepleId = playerTurn;
+                        playerArray[playerTurn].meeples--;
+                    }
+                    else if (strcmp(sectionChoice, "ouest") == 0) {
+                        currentTile.west.meepleId = playerTurn;
+                        playerArray[playerTurn].meeples--;
+                    }
+                    else if (strcmp(sectionChoice, "centre") == 0) {
+                        currentTile.center.meepleId = playerTurn;
+                        playerArray[playerTurn].meeples--;
+                    }
+                    else {
+                        printf("Veuillez entrer un choix valide.\n");
+                    }
+                } while (strcmp(sectionChoice, "nord") != 0 && strcmp(sectionChoice,"sud") != 0 && strcmp(sectionChoice, "ouest") != 0 && strcmp(sectionChoice, "est") != 0 && strcmp(sectionChoice, "centre") != 0);
             }
             isFirstTurn = false;
+            playerTurn++;
         }
         else {
             if (isPlaceable(tileArray[deckHeight - 1], gameGrid, tilePositions, tilesSet) == true) {
                 printf("La tuile piochee est placable !\n");
                 currentTile = draw(tileArray, deckHeight);
                 //printTiles(&currentTile, 1);
+                printTileContent(currentTile);
+                point* possibilities = returnPossibilities(currentTile, gameGrid, tilePositions, tilesSet);
+                point whereToPlace;
+                do {
+                    printf("Entrez la position x : ");
+                    scanf("%d", &whereToPlace.x);
+                    printf("Entrez la position y : ");
+                    scanf("%d", &whereToPlace.y);
+                    if (isPositionInArray(whereToPlace, possibilities) == false) {
+                        printf("Veuillez entrer une position valide.\n");
+                    }
+                } while (isPositionInArray(whereToPlace, possibilities) == false);
+                if (playerArray[playerTurn].meeples > 0) {
+
+                }
                 deckHeight--;
                 deckShifts = 0;
+                free(possibilities);
             }
             else { // LA TUILE PIOCHÉE N'EST PAS PLACABLE
                 printf("Tuile piochee non placable, on en pioche une autre.\n");
@@ -129,6 +171,5 @@ int main(int argc, char* argv[]) {
     free(playerArray);
     free(tileArray);
     free(tilePositions);
-
     return 0;
 }
