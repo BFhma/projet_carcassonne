@@ -1,25 +1,35 @@
 #include "tileFunctions.h"
 
+bool section_types_match(sectionType a, sectionType b) {
+    if (a == b) {
+        return true;
+    }
+    if ((a == town || a == aegis) && (b == town || b == aegis)) {
+        return true;
+    }
+    return false;
+}
+
 bool isPlaceable(tile t, tile** grid, point* positionArray, int size) {
     int rotations = 0;
     int i = 0;
     while (rotations < 4) {
-        if (grid[positionArray[i].x][positionArray[i].y].east.type == t.west.type) {
+        if (section_types_match(grid[positionArray[i].x][positionArray[i].y].east.type, t.west.type)) {
             if (grid[positionArray[i].x][positionArray[i].y - 1].center.type == empty) {
                 return true;
             }
         }
-        if (grid[positionArray[i].x][positionArray[i].y].west.type == t.east.type) {
+        if (section_types_match(grid[positionArray[i].x][positionArray[i].y].west.type, t.east.type)) {
             if (grid[positionArray[i].x][positionArray[i].y + 1].center.type == empty) {
                 return true;
             }
         }
-        if (grid[positionArray[i].x][positionArray[i].y].south.type == t.north.type) {
+        if (section_types_match(grid[positionArray[i].x][positionArray[i].y].south.type, t.north.type)) {
             if (grid[positionArray[i].x + 1][positionArray[i].y].center.type == empty) {
                 return true;
             }
         }
-        if (grid[positionArray[i].x][positionArray[i].y].north.type == t.south.type) {
+        if (section_types_match(grid[positionArray[i].x][positionArray[i].y].north.type, t.south.type)) {
             if (grid[positionArray[i].x - 1][positionArray[i].y].center.type == empty) {
                 return true;
             }
@@ -102,7 +112,6 @@ bool isMeeplePlaceable(tile t, section s) {
             return true;
         }
         case road: {
-            // TODO
         }
         default: {
             return false;
@@ -110,47 +119,122 @@ bool isMeeplePlaceable(tile t, section s) {
     }
 }
 
-point* returnPossibilities(tile t, tile** grid, point* positionArray, int size) {
-    int nbCells = (sizeof grid) / (sizeof grid[0][0]);
-    point *res = malloc(nbCells * sizeof *res);
+point* returnPossibilities(tile t, tile** grid, int gridSize, point* positionArray, int size, int* count) {
+    int maxPossibilities = size * 4;
+    if (maxPossibilities <= 0) {
+        *count = 0;
+        return NULL;
+    }
+
+    point *res = malloc(maxPossibilities * sizeof *res);
+    if (!res) {
+        *count = 0;
+        return NULL;
+    }
+
     int possibilities = 0;
-    for (int i = 0 ; i < size ; i++) {
-        if (grid[positionArray[i].x - 1][positionArray[i].y].center.type == empty) {
-            if (grid[positionArray[i].x][positionArray[i].y].north.type == t.south.type) {
-                res[possibilities].x = positionArray[i].x - 1;
-                res[possibilities].y = positionArray[i].y;
-                possibilities++;
+    int dx[4] = {-1, 1, 0, 0};
+    int dy[4] = {0, 0, -1, 1};
+
+    for (int i = 0; i < size; i++) {
+        int baseX = positionArray[i].x;
+        int baseY = positionArray[i].y;
+
+        for (int dir = 0; dir < 4; dir++) {
+            int cx = baseX + dx[dir];
+            int cy = baseY + dy[dir];
+
+            bool validLocation = true;
+            if (cx < 0 || cy < 0 || cx >= gridSize || cy >= gridSize) {
+                validLocation = false;
             }
-        }
-        if (grid[positionArray[i].x + 1][positionArray[i].y].center.type == empty) {
-            if (grid[positionArray[i].x][positionArray[i].y].south.type == t.north.type) {
-                res[possibilities].x = positionArray[i].x + 1;
-                res[possibilities].y = positionArray[i].y;
-                possibilities++;
+            if (validLocation && grid[cx][cy].center.type != empty) {
+                validLocation = false;
             }
-        }
-        if (grid[positionArray[i].x][positionArray[i].y - 1].center.type == empty) {
-            if (grid[positionArray[i].x][positionArray[i].y].west.type == t.east.type) {
-                res[possibilities].x = positionArray[i].x;
-                res[possibilities].y = positionArray[i].y - 1;
-                possibilities++;
+
+            if (validLocation) {
+                bool duplicate = false;
+                for (int k = 0; k < possibilities; k++) {
+                    if (res[k].x == cx && res[k].y == cy) {
+                        duplicate = true;
+                    }
+                }
+                if (duplicate) {
+                    validLocation = false;
+                }
             }
-        }
-        if (grid[positionArray[i].x][positionArray[i].y + 1].center.type == empty) {
-            if (grid[positionArray[i].x][positionArray[i].y].east.type == t.west.type) {
-                res[possibilities].x = positionArray[i].x;
-                res[possibilities].y = positionArray[i].y + 1;
+
+            if (validLocation) {
+                bool hasNeighbor = false;
+                bool allMatch = true;
+
+                for (int checkDir = 0; checkDir < 4; checkDir++) {
+                    int nx = cx + dx[checkDir];
+                    int ny = cy + dy[checkDir];
+
+                    bool neighborExists = true;
+                    if (nx < 0 || ny < 0 || nx >= gridSize || ny >= gridSize) {
+                        neighborExists = false;
+                    }
+                    if (neighborExists && grid[nx][ny].center.type == empty) {
+                        neighborExists = false;
+                    }
+
+                    if (neighborExists) {
+                        hasNeighbor = true;
+                        section candidateSection;
+                        section neighborSection;
+
+                        if (checkDir == 0) {
+                            candidateSection = t.north;
+                            neighborSection = grid[nx][ny].south;
+                        } else if (checkDir == 1) {
+                            candidateSection = t.south;
+                            neighborSection = grid[nx][ny].north;
+                        } else if (checkDir == 2) {
+                            candidateSection = t.west;
+                            neighborSection = grid[nx][ny].east;
+                        } else {
+                            candidateSection = t.east;
+                            neighborSection = grid[nx][ny].west;
+                        }
+
+                        if (!section_types_match(candidateSection.type, neighborSection.type)) {
+                            allMatch = false;
+                        }
+                    }
+                }
+
+                if (!hasNeighbor || !allMatch) {
+                    validLocation = false;
+                }
+            }
+
+            if (validLocation) {
+                res[possibilities].x = cx;
+                res[possibilities].y = cy;
                 possibilities++;
             }
         }
     }
-    res = realloc(res, sizeof(point) * possibilities);
-    return res;
+
+    *count = possibilities;
+    if (possibilities == 0) {
+        free(res);
+        return NULL;
+    }
+
+    point* trimmed = realloc(res, sizeof(point) * possibilities);
+    return trimmed ? trimmed : res;
 }
 
 void printPossibilities(point* possibilities, int size) {
-    int length = sizeof(possibilities) / sizeof(possibilities[0]);
-    for (int i = 0 ; i < length ; i++) {
+    for (int i = 0 ; i < size ; i++) {
         printf("Tuile placable en : %d;%d.\n", possibilities[i].x, possibilities[i].y);
     }
+}
+
+
+int tile_is_empty(tile t) {
+    return (t.center.type == empty && t.north.type == empty && t.south.type == empty && t.east.type == empty && t.west.type == empty);
 }
