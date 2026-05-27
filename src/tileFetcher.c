@@ -6,6 +6,7 @@ int countLines(char* filename) {
     FILE* f = fopen(filename, "r");
     if (f == NULL) {
         printf("le fichier n'a pas pu etre ouvert\n");
+        return -1;
     }
     int res = 0;
     char c;
