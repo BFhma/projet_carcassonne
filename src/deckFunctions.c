@@ -14,17 +14,22 @@ void shuffleDeck(tile* deck, int size) {
     }
 }
 
-tile draw(tile* deck, int size) {
-    tile res;
-    if (size == 1) {
-        res = deck[0];
-        return res;
-    }
+tile draw(tile** deck, int* size) {
+    tile res = (*deck)[*size - 1];
+    (*size)--;
+
+    if (*size == 0) {
+        free(*deck);
+        *deck = NULL;
+    } 
     else {
-        res = deck[size - 1];
-        realloc(deck, (size - 1) * sizeof(*deck));
-        return res;
+        tile *tmp = realloc(*deck, (*size) * sizeof(tile));
+        if (tmp != NULL) {
+            *deck = tmp;
+        }
     }
+
+    return res;
 }
 
 void shiftLeft(tile* deck, int size) {

@@ -3,7 +3,7 @@
 
 void shuffleDeck(tile* deck, int size);
 
-tile draw(tile* deck, int size);
+tile draw(tile** deck, int* size);
 
 void shiftLeft(tile* deck, int size);
 /* CETTE FONCTION DÉCALE TOUTES LES TUILES VERS LA GAUCHE DU PAQUET, CETTE FONCTION
